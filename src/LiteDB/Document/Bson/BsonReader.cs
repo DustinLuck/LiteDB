@@ -1,5 +1,6 @@
 ﻿namespace LiteDB;
 //minor change to trigger action
+//minor change to trigger action
 /// <summary>
 /// </summary>
 [AutoInterface]
