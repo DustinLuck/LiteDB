@@ -5,7 +5,7 @@ on:
     branches:
       - dev
     paths:
-      - 'LiteDB/**'
+      - 'src/LiteDB/**'
 
 jobs:
   build-and-release:
