@@ -1,0 +1,47 @@
+name: Build and Release on Dev Branch
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'LiteDB/**'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build Solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Extract Version From Project and Build Final Version
+        id: version
+        shell: bash
+        run: |
+          BASE_VERSION=$(grep -oPm1 "(?<=<VersionPrefix>)[^<]+" LiteDB/LiteDB.csproj)
+          FULL_VERSION="$BASE_VERSION-preview.${{ github.run_number }}"
+          echo "full_version=$FULL_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Pack NuGet Package
+        run: dotnet pack LiteDB/LiteDB.csproj --configuration Release -p:PackageVersion=${{ steps.version.outputs.full_version }} --no-build -o ./artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.full_version }}
+          name: LiteDB Preview v${{ steps.version.outputs.full_version }}
+          files: ./artifacts/*.nupkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
