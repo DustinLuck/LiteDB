@@ -6,6 +6,7 @@ on:
       - dev
     paths:
       - 'src/LiteDB/**'
+    workflow_dispatch:
 
 jobs:
   build-and-release:
