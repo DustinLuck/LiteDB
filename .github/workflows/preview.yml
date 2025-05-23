@@ -21,21 +21,21 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore src/LiteDB.sln
 
       - name: Build Solution
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build src/LiteDB.sln --configuration Release --no-restore
 
       - name: Extract Version From Project and Build Final Version
         id: version
         shell: bash
         run: |
-          BASE_VERSION=$(grep -oPm1 "(?<=<VersionPrefix>)[^<]+" LiteDB/LiteDB.csproj)
+          BASE_VERSION=$(grep -oPm1 "(?<=<VersionPrefix>)[^<]+" src/LiteDB/LiteDB.csproj)
           FULL_VERSION="$BASE_VERSION-preview.${{ github.run_number }}"
           echo "full_version=$FULL_VERSION" >> $GITHUB_OUTPUT
 
       - name: Pack NuGet Package
-        run: dotnet pack LiteDB/LiteDB.csproj --configuration Release -p:PackageVersion=${{ steps.version.outputs.full_version }} --no-build -o ./artifacts
+        run: dotnet pack src/LiteDB/LiteDB.csproj --configuration Release -p:PackageVersion=${{ steps.version.outputs.full_version }} --no-build -o ./artifacts
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
