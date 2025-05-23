@@ -30,7 +30,7 @@ jobs:
         id: version
         shell: bash
         run: |
-          BASE_VERSION=$(grep -oPm1 "(?<=<VersionPrefix>)[^<]+" src/LiteDB/LiteDB.csproj)
+          BASE_VERSION=$(sed -n 's|.*<VersionPrefix>\(.*\)</VersionPrefix>.*|\1|p' src/LiteDB/LiteDB.csproj)
           FULL_VERSION="$BASE_VERSION-preview.${{ github.run_number }}"
           echo "full_version=$FULL_VERSION" >> $GITHUB_OUTPUT
 
